@@ -53,6 +53,8 @@ function New-ClassRoom {
     param(
         [Object]$CountUser=(GetConfig).'default-usercount',
         [string]$targetOu,
+        [string]$ClassName,
+        [string]$UserPrefix,
         [string]$password,
         [Object]$PasswordLength=(GetConfig).'password-length',
         [bool]$MailToUser,
@@ -66,14 +68,23 @@ function New-ClassRoom {
 # Optional Passwort Länge
 # Optional Mail an User
 # Optional Mailbetreff
-
+Import-Module ActiveDirectory
 
    try {
-    $CountUser
-        throw "Testfehler"
+    #Start-Transaction
+    ###  Fokus auf OU holen
+    $ou=Get-ADOrganizationalUnit $targetOu
+    $ou
+    ### Nutzer anlegen
+    
+    ### Gruppe anlegen
+    ### Nutzer zuordnen
+    ### Niutzer per Mail infornieren
+    #Use-Transaction
    }
    catch {
     Write-Error "Fehler im Modul"
+   # Undo-Transaction
     <#Do this if a terminating exception happens#>
    }
 
