@@ -25,6 +25,13 @@ function RandomPasswords {
     return $password
 }
 
+function GetConfig {
+    $executionPath = split-path -parent $MyInvocation.MyCommand.Definition
+    $path = "$executionPath\config.json" 
+    $config = Get-Content -Path $path | ConvertFrom-Json
+    return $config
+}
+
 ## Klassenraum anlegen
 # Eingangswerte
 # Anzahl User
@@ -33,29 +40,29 @@ function RandomPasswords {
 # Optional Passwort Länge
 # Optional Mail an User
 # Optional Mailbetreff
-function New-ClassRoom{
+function New-ClassRoom {
 
 
 }
 
 ## Klassenraum entfernen
-function Remove-ClassRoom{
+function Remove-ClassRoom {
 
     
 }
 ## Nutzer Importieren
 # Eingangswerte Klassenraum
 # Pfad zur CSV
-function Import-ClassRoomUser{
+function Import-ClassRoomUser {
 
     
 }
 
 
 ## Eventfunction Nutzer deaktivieren die sich längere Zeit nicht angemeldet haben
-function Disable-ClassRoomUserInactive{
+function Disable-ClassRoomUserInactive {
 
     
 }
 
-Export-ModuleMember -Function New-ClassRoom,Remove-ClassRoom,Import-ClassRoomUser,Disable-ClassRoomUserInactive
+Export-ModuleMember -Function New-ClassRoom, Remove-ClassRoom, Import-ClassRoomUser, Disable-ClassRoomUserInactive
