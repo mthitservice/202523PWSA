@@ -12,7 +12,7 @@ $Number=1..$usercount
 foreach ($z in $Number)
 {
     Write-Host $userprefix$z
-    New-ADUser -Name $userprefix$z -Path $targetpath -Enabled $false -ChangePasswordAtLogon $true -AccountPassword $pass -AccountExpirationDate $ExpirationDate
+    New-ADUser -Name $userprefix$z -Path $targetpath -Enabled $true -ChangePasswordAtLogon $true -AccountPassword $pass -AccountExpirationDate $ExpirationDate
 }
 
 # Objekte löschen in bestimmten Bereichen
@@ -28,4 +28,4 @@ $user =Search-ADAccount -UsersOnly -AccountInactive -SearchBase $targetpath
 $user| Remove-ADObject -Confirm:$true
 
 ### Nach inaktivität suchen
-Search-ADAccount -UsersOnly -AccountDisabled  | Get-ADUser | Sort-Object LastLogOnDate | Select-Object Name,LastLogOnDate,Title,DistinguishedName
+Search-ADAccount -UsersOnly -AccountDisabled  | Get-ADUser -Properties LastLogOnDate| Sort-Object LastLogOnDate | Select-Object Name,LastLogOnDate,Title,DistinguishedName
