@@ -18,7 +18,13 @@ foreach ($z in $Number)
 # Objekte löschen in bestimmten Bereichen
 Get-ADUser -Filter	* -SearchBase $targetpath
 
+# Gruppe hinzufügen
 $user =Get-ADObject -Filter "ObjectClass -eq 'user'" -SearchBase $targetpath
+$g=New-ADGroup  -name Studenten -Path $targetpath -GroupCategory Security  -GroupScope Global
+$g | Add-ADGroupMember -Members $user
+# Schüler der Gruppe zuordnen
+
+$user =Get-ADObject -filter "ObjectClass -eq 'user' -or ObjectClass -eq 'group'" -SearchBase $targetpath
 $user| Remove-ADObject -Confirm:$true
 
 ### Suche in der AD
