@@ -35,3 +35,11 @@ $user| Remove-ADObject -Confirm:$true
 
 ### Nach inaktivität suchen
 Search-ADAccount -UsersOnly -AccountDisabled  | Get-ADUser -Properties LastLogOnDate| Sort-Object LastLogOnDate | Select-Object Name,LastLogOnDate,Title,DistinguishedName
+### Passwortgenerator
+
+function RandomPasswort {
+    param (
+        $Characters
+    )
+    
+}
