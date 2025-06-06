@@ -1,5 +1,6 @@
 {
 "smtp-server" :"ith-mgm01.ith-ml35.local",
-"password-length":16
+"password-length":16,
+"default-usercount":5
 
 }

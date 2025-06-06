@@ -26,9 +26,15 @@ function RandomPasswords {
 }
 
 function GetConfig {
-    $executionPath = split-path -parent $MyInvocation.MyCommand.Definition
-    $path = "$executionPath\config.json" 
+   try{
+    $executionPath = $MyInvocation.PSScriptRoot
+    $path = $executionPath + '\config.json'
+    Write-Debug $path
     $config = Get-Content -Path $path | ConvertFrom-Json
+   }
+   catch {
+    Write-Error "Fehler beim laden der Konfigurationsdatei"
+   }
     return $config
 }
 
@@ -41,6 +47,37 @@ function GetConfig {
 # Optional Mail an User
 # Optional Mailbetreff
 function New-ClassRoom {
+        # Eingangswerte
+    [CmdletBinding()]
+   
+    param(
+        [Object]$CountUser=(GetConfig).'default-usercount',
+        [string]$targetOu,
+        [string]$password,
+        [Object]$PasswordLength=(GetConfig).'password-length',
+        [bool]$MailToUser,
+        [string]$MailSubject=""
+
+
+    )
+# Anzahl User
+# EinstigsOU
+# Optional statisches Passwort
+# Optional Passwort Länge
+# Optional Mail an User
+# Optional Mailbetreff
+
+
+   try {
+    $CountUser
+        throw "Testfehler"
+   }
+   catch {
+    Write-Error "Fehler im Modul"
+    <#Do this if a terminating exception happens#>
+   }
+
+
 
 
 }
