@@ -150,7 +150,22 @@ function Import-ClassRoomUser {
 ## Eventfunction Nutzer deaktivieren die sich längere Zeit nicht angemeldet haben
 function Disable-ClassRoomUserInactive {
 
-    
+    param(
+         [string]$targetOu
+
+    )
+    $user =Search-ADAccount -UsersOnly -AccountInactive -SearchBase $targetOu
+    $user|  Disable-ADAccount
+    $logName="Application"
+    $source="ITHPOwershellModul"
+    $eventId =1001
+    $entryType="Information"
+    $message="User disabled"
+    if (-not [System.Diagnostics.EventLog]::SourceExists($source))
+    {
+        [System.Diagnostics.EventLog]::CreateEventSource($source,$logName)
+    }
+    Write-EventLog -LogName $logName -Source $source -EventId $eventId -EntryType $entryType -Message $message
 }
 
 Export-ModuleMember -Function New-ClassRoom, Remove-ClassRoom, Import-ClassRoomUser, Disable-ClassRoomUserInactive
