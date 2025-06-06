@@ -26,15 +26,15 @@ function RandomPasswords {
 }
 
 function GetConfig {
-   try{
-    $executionPath = $MyInvocation.PSScriptRoot
-    $path = $executionPath + '\config.json'
-    Write-Debug $path
-    $config = Get-Content -Path $path | ConvertFrom-Json
-   }
-   catch {
-    Write-Error "Fehler beim laden der Konfigurationsdatei"
-   }
+    try {
+        $executionPath = $MyInvocation.PSScriptRoot
+        $path = $executionPath + '\config.json'
+        Write-Debug $path
+        $config = Get-Content -Path $path | ConvertFrom-Json
+    }
+    catch {
+        Write-Error "Fehler beim laden der Konfigurationsdatei"
+    }
     return $config
 }
 
@@ -47,46 +47,69 @@ function GetConfig {
 # Optional Mail an User
 # Optional Mailbetreff
 function New-ClassRoom {
-        # Eingangswerte
+    # Eingangswerte
     [CmdletBinding()]
    
     param(
-        [Object]$CountUser=(GetConfig).'default-usercount',
+        [int]$CountUser = [int](GetConfig).'default-usercount',
         [string]$targetOu,
         [string]$ClassName,
         [string]$UserPrefix,
         [string]$password,
-        [Object]$PasswordLength=(GetConfig).'password-length',
+        [int]$PasswordLength = [int](GetConfig).'password-length',
         [bool]$MailToUser,
-        [string]$MailSubject=""
+        [string]$MailSubject = ""
 
 
     )
-# Anzahl User
-# EinstigsOU
-# Optional statisches Passwort
-# Optional Passwort Länge
-# Optional Mail an User
-# Optional Mailbetreff
-Import-Module ActiveDirectory
+    # Anzahl User
+    # EinstigsOU
+    # Optional statisches Passwort
+    # Optional Passwort Länge
+    # Optional Mail an User
+    # Optional Mailbetreff
+    Import-Module ActiveDirectory
 
-   try {
-    #Start-Transaction
-    ###  Fokus auf OU holen
-    $ou=Get-ADOrganizationalUnit $targetOu
-    $ou
-    ### Nutzer anlegen
-    
-    ### Gruppe anlegen
-    ### Nutzer zuordnen
-    ### Niutzer per Mail infornieren
-    #Use-Transaction
-   }
-   catch {
-    Write-Error "Fehler im Modul"
-   # Undo-Transaction
-    <#Do this if a terminating exception happens#>
-   }
+    try {
+        #Start-Transaction
+        ###  Fokus auf OU holen
+        $ou = Get-ADOrganizationalUnit $targetOu
+        $ou
+        ### Nutzer anlegen
+
+        $days = 5
+        $ExpirationDate = (Get-Date).AddDays($days);
+
+
+        $Number = 1..$CountUser
+        [System.Collections.ArrayList]$AddedUser =New-Object System.Collections.ArrayList
+        foreach ($z in $Number) {
+           $pass = 'Pa55w.rd' | ConvertTo-SecureString -AsPlainText -Force
+      
+            if ($password.Length -gt 4) {
+                $pass = $password | ConvertTo-SecureString -AsPlainText -Force
+            }
+            else
+            {
+                $pass = RandomPasswords -Characters $PasswordLength | ConvertTo-SecureString -AsPlainText -Force
+            }
+            Write-Debug $UserPrefix$z
+            Write-Debug $pass
+            $u=New-ADUser -Name $UserPrefix$z -Path $targetOu -Enabled $true -ChangePasswordAtLogon $true -AccountPassword $pass -AccountExpirationDate $ExpirationDate
+            $AddedUser.Add($u)
+        }
+        $AddedUser.Count
+        ### Gruppe anlegen
+        ### Nutzer zuordnen
+        ### Niutzer per Mail infornieren
+        #Use-Transaction
+    }
+    catch {
+        Write-Error "Fehler im Modul"
+         Write-Output $_.Exception
+        # Undo-Transaction
+        <#Do this if a terminating exception happens#>
+    }
 
 
 
