@@ -56,6 +56,7 @@ function New-ClassRoom {
         [string]$ClassName,
         [string]$UserPrefix,
         [string]$password,
+        [string]$SmtpServer = (GetConfig).'smtp-server',
         [int]$PasswordLength = [int](GetConfig).'password-length',
         [bool]$MailToUser,
         [string]$MailSubject = ""
@@ -94,14 +95,30 @@ function New-ClassRoom {
                 $pass = RandomPasswords -Characters $PasswordLength | ConvertTo-SecureString -AsPlainText -Force
             }
             Write-Debug $UserPrefix$z
-            Write-Debug $pass
-            $u=New-ADUser -Name $UserPrefix$z -Path $targetOu -Enabled $true -ChangePasswordAtLogon $true -AccountPassword $pass -AccountExpirationDate $ExpirationDate
+            Write-Host $pass
+            $u=New-ADUser -Name $UserPrefix$z -Description $ClassName  -SamAccountName $UserPrefix$z -UserPrincipalName $UserPrefix$z  -Path $targetOu -Enabled $true -ChangePasswordAtLogon $true -AccountPassword $pass -AccountExpirationDate $ExpirationDate -PassThru
+           
             $AddedUser.Add($u)
         }
         $AddedUser.Count
         ### Gruppe anlegen
+
+       $g=New-ADGroup  -name $ClassName -Path $targetOu -GroupCategory Security  -GroupScope Global
         ### Nutzer zuordnen
-        ### Niutzer per Mail infornieren
+        Write-Information "Send Mail"
+        $use =Get-ADObject -Filter "ObjectClass -eq 'user'" -SearchBase $targetOu
+        $g | Add-ADGroupMember -Members $use
+        ### Nutzer per Mail infornieren
+        Write-Information "Send Mail"
+       foreach ($us in $AddedUser)
+        {
+           
+           
+            Write-Host "Mail an User " $us.Name
+            $m=$us.name +'@' + $SmtpServer
+            Send-MailMessage -From 'info@xyz.de' -to $m -Subject $MailSubject -Body "Ihr Account wurde eingerichtet" -SmtpServer $SmtpServer
+ 
+        }
         #Use-Transaction
     }
     catch {
